@@ -32,7 +32,7 @@ export class CalcadosController {
 
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Erro interno no servidor na criação do calçado" });
+      return res.status(500).json({ error: "Erro interno ao criar calçado" });
     }
   }
 
@@ -77,7 +77,21 @@ export class CalcadosController {
       console.error(error);
       return res.status(500).json({ error: "Erro interno ao atualizar calçado" });
     }
-        }
-
+  }
   
+  async delete (req : Request, res : Response) {
+    try {
+      const {id} = req.params;
+
+      await prisma.calcado.delete({
+        where : {id : Number(id)}
+      });
+
+      return res.status(200).json({
+        message: "Calçado deletado !" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro interno ao deletar calçado" });
+    }
+  }
 }
