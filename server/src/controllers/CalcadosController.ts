@@ -46,5 +46,38 @@ export class CalcadosController {
     }
   }
 
+  async update(req : Request, res : Response) {
+    try {
+      const {id} = req.params;
+      const {nome_produto, cor, marca, tamanho, preco, quantidade_em_estoque} = req.body;
+
+      let precoEmCentavos;
+      if (preco) {
+        precoEmCentavos = Math.round(preco * 100);
+      }
+
+      const calcadoAtualizado = await prisma.calcado.update({
+        where : { id: Number(id) },
+        data: {
+          nome_produto,
+          cor,
+          marca,
+          tamanho,
+          preco: precoEmCentavos,
+          quantidade_em_estoque
+        }
+      });
+
+      return res.status(200).json({
+        message: "Calçado atualizado !",
+        calcado: calcadoAtualizado
+      });
+    
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro interno ao atualizar calçado" });
+    }
+        }
+
   
 }
