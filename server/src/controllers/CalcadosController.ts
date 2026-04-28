@@ -36,5 +36,15 @@ export class CalcadosController {
     }
   }
 
+  async read(req: Request, res: Response) {
+    try {
+      const calcados = await prisma.calcado.findMany();
+      return res.status(200).json(calcados);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro interno ao buscar calçados" });
+    }
+  }
+
   
 }
