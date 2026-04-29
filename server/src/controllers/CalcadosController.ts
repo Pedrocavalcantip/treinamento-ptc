@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { CalcadosRepository } from "../repositories/CalcadosRepository";
 
 const prisma = new PrismaClient();
 
@@ -38,11 +39,35 @@ export class CalcadosController {
 
   async read(req: Request, res: Response) {
     try {
+      const { marca, tamanho } = req.query;
+      const repository = new CalcadosRepository();
+
+      if (tamanho) {
+        const calcados = await repository.buscarPorTamanho(Number(tamanho));
+        return res.status(200).json(calcados);
+      }
+      if (marca) {
+        const calcados = await repository.buscarPorMarca(marca as string);
+        return res.status(200).json(calcados);
+      }
       const calcados = await prisma.calcado.findMany();
       return res.status(200).json(calcados);
+
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "Erro interno ao buscar calçados" });
+    }
+  }
+
+  async getEstoque(req: Request, res: Response) {
+    try {
+      const repository = new CalcadosRepository();
+      const total = await repository.contarEstoqueTotal();
+      
+      return res.status(200).json({ total_pares_cadastrados: total });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro ao calcular estoque" });
     }
   }
 
