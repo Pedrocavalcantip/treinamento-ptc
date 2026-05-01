@@ -6,13 +6,15 @@ const prisma = new PrismaClient();
 
 export class CalcadosController {
   async create(req: Request, res: Response) {
-    
     try {
       const { nome_produto, cor, marca, tamanho, preco, quantidade_em_estoque } = req.body;
 
+      // Exige campos minimos para evitar gravar registros incompletos.
       if (!nome_produto || !marca || !preco) {
         return res.status(400).json({ error: "Faltam dados obrigatórios" });
       }
+
+      // Armazena preco como inteiro para evitar erros de ponto flutuante.
       const precoEmCentavos = Math.round(preco * 100);
 
         const novoCalcado = await prisma.calcado.create({
@@ -42,6 +44,7 @@ export class CalcadosController {
       const { marca, tamanho } = req.query;
       const repository = new CalcadosRepository();
 
+      // Se vier filtro, prioriza a busca filtrada.
       if (tamanho) {
         const calcados = await repository.buscarPorTamanho(Number(tamanho));
         return res.status(200).json(calcados);
@@ -50,6 +53,8 @@ export class CalcadosController {
         const calcados = await repository.buscarPorMarca(marca as string);
         return res.status(200).json(calcados);
       }
+
+      // Sem filtros, retorna lista completa.
       const calcados = await prisma.calcado.findMany();
       return res.status(200).json(calcados);
 
@@ -62,6 +67,8 @@ export class CalcadosController {
   async getEstoque(req: Request, res: Response) {
     try {
       const repository = new CalcadosRepository();
+
+      // Soma total de pares cadastrados para relatorio rapido.
       const total = await repository.contarEstoqueTotal();
       
       return res.status(200).json({ total_pares_cadastrados: total });
@@ -78,6 +85,7 @@ export class CalcadosController {
 
       let precoEmCentavos;
       if (preco) {
+        // Atualiza preco apenas se veio no payload.
         precoEmCentavos = Math.round(preco * 100);
       }
 
@@ -108,6 +116,7 @@ export class CalcadosController {
     try {
       const {id} = req.params;
 
+      // Exclui pelo id informado na rota.
       await prisma.calcado.delete({
         where : {id : Number(id)}
       });

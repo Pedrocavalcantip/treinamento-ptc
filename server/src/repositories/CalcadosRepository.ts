@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export class CalcadosRepository {
-  // 1) Buscar calçados por tamanho
+  // Filtro direto por tamanho.
   async buscarPorTamanho(tamanho: number) {
     return await prisma.calcado.findMany({
       where: { tamanho: Number(tamanho) },
@@ -22,7 +22,7 @@ export class CalcadosRepository {
   }
 
   async contarEstoqueTotal() {
-    // O Prisma soma a coluna 'quantidade_em_estoque' de todos os registros
+    // Soma total de pares em estoque para relatorio simples.
     const resultado = await prisma.calcado.aggregate({
       _sum: {
         quantidade_em_estoque: true,
